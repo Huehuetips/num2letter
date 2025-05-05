@@ -53,7 +53,7 @@ app.post('/convertir', (req, res) => {
 });
 
 // Ruta para servir versiones específicas
-app.get('/version/:version/*', (req, res) => {
+app.get('/version/:version/', (req, res) => {
     const version = req.params.version;
     const filePath = req.params[0] || 'index.html';
     const versionPath = path.join(__dirname, 'public', 'versions', version, filePath);
@@ -62,32 +62,6 @@ app.get('/version/:version/*', (req, res) => {
         res.sendFile(versionPath);
     } else {
         res.status(404).send('Archivo o versión no encontrada.');
-    }
-});
-
-// Ruta para detectar y servir la última versión automáticamente
-app.get('/version/*', (req, res) => {
-    const filePath = req.params[0] || 'index.html';
-    const versionsDir = path.join(__dirname, 'public', 'versions');
-
-    if (!fs.existsSync(versionsDir)) {
-        return res.status(404).send('No se encontraron versiones disponibles.');
-    }
-
-    // Obtener la lista de versiones y ordenar por nombre (asumiendo formato semántico)
-    const versions = fs.readdirSync(versionsDir).filter(dir => fs.statSync(path.join(versionsDir, dir)).isDirectory());
-    const latestVersion = versions.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))[0];
-
-    if (!latestVersion) {
-        return res.status(404).send('No se encontraron versiones disponibles.');
-    }
-
-    const latestVersionPath = path.join(versionsDir, latestVersion, filePath);
-
-    if (fs.existsSync(latestVersionPath)) {
-        res.sendFile(latestVersionPath);
-    } else {
-        res.status(404).send('Archivo no encontrado en la última versión.');
     }
 });
 
