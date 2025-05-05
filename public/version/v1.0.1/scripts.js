@@ -5,32 +5,6 @@ const listaNumerosTextarea = document.getElementById('listaNumeros');
 const resultadosLista = document.getElementById('resultadosLista');
 const loadingIndividual = document.getElementById('loading-individual');
 
-const toggleApiBtn = document.getElementById('toggle-api');
-const apiPanel = document.getElementById('api-panel');
-const apiContent = document.getElementById('api-content');
-const copiarApiBtn = document.getElementById('copiar-api');
-
-toggleApiBtn.addEventListener('click', () => {
-    const isVisible = !apiPanel.classList.contains('d-none');
-    apiPanel.classList.toggle('d-none', isVisible);
-    toggleApiBtn.textContent = isVisible ? '▸ Ver consulta API' : '▾ Ocultar consulta API';
-});
-
-const mostrarConsultaApi = (params) => {
-    const payload = JSON.stringify(params, null, 2);
-    apiContent.textContent = `POST /convertir\n\n${payload}`;
-};
-
-copiarApiBtn.addEventListener('click', () => {
-    const text = apiContent.textContent;
-    if (text) {
-        navigator.clipboard.writeText(text);
-        showToast("Consulta copiada");
-    }
-});
-
-
-
 // Inputs de configuración (todos los que no sean el número ni la lista)
 const configInputs = [
     ...Array.from(document.querySelectorAll('#incluirMoneda, #mostrarCentavos, #mostrarCentavosEnNumeros, #nombreMoneda'))
@@ -57,23 +31,11 @@ const toggleVisibility = (element, condition) => {
 const getFormParams = () => {
     const formData = new FormData(form);
     const params = Object.fromEntries(formData.entries());
-
-    // Asegurarse de incluir los booleanos como string
-    params.incluirMoneda = document.getElementById('incluirMoneda').checked.toString();
-    params.mostrarCentavos = document.getElementById('mostrarCentavos').checked.toString();
-    params.mostrarCentavosEnNumeros = document.getElementById('mostrarCentavosEnNumeros').checked.toString();
-
-    // Asegurar que nombreMoneda se incluya si aplica
-    if (document.getElementById('incluirMoneda').checked) {
-        const nombreMoneda = document.getElementById('nombreMoneda').value.trim();
-        params.nombreMoneda = nombreMoneda || ''; // Evita null
-    } else {
-        delete params.nombreMoneda;
-    }
-
+    ['incluirMoneda', 'mostrarCentavosEnNumeros', 'mostrarCentavos'].forEach(key => {
+        params[key] = document.getElementById(key).checked.toString();
+    });
     return params;
 };
-
 
 // Mostrar mensaje de error en la tabla
 const showErrorRow = (message) => {
@@ -93,8 +55,6 @@ const crearFilaResultado = (numero, letras) => {
 // Llamada al backend
 const realizarConversion = async (params, callback) => {
     try {
-        mostrarConsultaApi(params); // 👈 Mostrar el contenido real que se enviará
-
         const response = await fetch('/convertir', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -108,7 +68,6 @@ const realizarConversion = async (params, callback) => {
         callback(null, error.message);
     }
 };
-
 
 // Actualizar número individual
 const actualizarConversionIndividual = () => {
@@ -133,83 +92,47 @@ const actualizarConversionIndividual = () => {
 // Actualizar lista
 const actualizarResultadosLista = () => {
     const listaNumeros = listaNumerosTextarea.value.trim();
-    const lineas = listaNumeros.split('\n').map(line => line.trim());
+    const numeros = listaNumeros
+        .split('\n')
+        .map(num => num.trim())
+        .filter(num => !isNaN(num));
 
-    const filasActuales = Array.from(resultadosLista.querySelectorAll('tr'));
-    const nuevosNumeros = [];
-    const filasPendientes = [];
-
-    lineas.forEach((valor, index) => {
-        const existente = filasActuales[index];
-
-        if (!valor || isNaN(valor)) {
-            const filaError = document.createElement('tr');
-            filaError.innerHTML = `<td colspan="2" class="text-danger">❌ Valor inválido: "${valor || '[vacío]'}"</td>`;
-
-            if (!existente || !existente.querySelector('td')?.classList.contains('text-danger')) {
-                if (existente) resultadosLista.replaceChild(filaError, existente);
-                else resultadosLista.appendChild(filaError);
-            }
-
-        } else {
-            // Crear o reutilizar fila válida
-            let filaValida;
-
-            if (!existente || existente.querySelector('td')?.classList.contains('text-danger')) {
-                filaValida = document.createElement('tr');
-                filaValida.classList.add('fila-valida');
-                filaValida.innerHTML = `<td>${valor}</td><td></td>`;
-
-                if (existente) resultadosLista.replaceChild(filaValida, existente);
-                else resultadosLista.appendChild(filaValida);
-            } else {
-                filaValida = existente;
-                filaValida.classList.add('fila-valida');
-            }
-
-            nuevosNumeros.push(valor);
-            filasPendientes.push(filaValida);
-        }
-    });
-
-    // Quitar filas sobrantes si el usuario borró líneas
-    while (resultadosLista.children.length > lineas.length) {
-        resultadosLista.removeChild(resultadosLista.lastChild);
-    }
-
-    if (nuevosNumeros.length === 0) {
+    if (!listaNumeros || numeros.length === 0) {
+        showErrorRow(!listaNumeros ? 'Por favor, ingresa una lista de números.' : 'No se encontraron números válidos en la lista.');
         return;
     }
 
     const params = getFormParams();
-    params.numero = nuevosNumeros;
+    params.numero = numeros;
 
     realizarConversion(params, (data, error) => {
         if (error) return showErrorRow(error);
         if (!Array.isArray(data.resultados)) return showErrorRow('Error al convertir la lista.');
 
-        data.resultados.forEach((item, index) => {
-            const fila = filasPendientes[index];
-            const celdas = fila.querySelectorAll('td');
-            const nuevoTexto = item.letras.trim();
-            const textoActual = celdas[1].textContent.trim();
+        const existingRows = resultadosLista.querySelectorAll('tr');
+        const newResults = data.resultados;
 
-            if (textoActual !== nuevoTexto || celdas[0].textContent.trim() !== item.numero.toString()) {
-                // Actualiza el número por si cambió (input corregido, etc.)
-                celdas[0].textContent = item.numero;
-                celdas[1].textContent = nuevoTexto;
-            
-                celdas[1].classList.add('celda-actualizada');
-                setTimeout(() => celdas[1].classList.remove('celda-actualizada'), 400);
+        newResults.forEach((item, index) => {
+            const newContent = `<td>${item.numero}</td><td>${item.letras}</td>`;
+            const existingRow = existingRows[index];
+
+            if (existingRow) {
+                if (existingRow.innerHTML !== newContent) {
+                    existingRow.innerHTML = newContent;
+                    existingRow.classList.add('fila-actualizada');
+                    setTimeout(() => existingRow.classList.remove('fila-actualizada'), 400);
+                }
+            } else {
+                resultadosLista.appendChild(crearFilaResultado(item.numero, item.letras));
             }
-            
         });
+
+        // Quitar filas sobrantes
+        for (let i = newResults.length; i < existingRows.length; i++) {
+            resultadosLista.removeChild(existingRows[i]);
+        }
     });
 };
-
-
-
-
 
 // Mostrar campos dependientes
 document.getElementById('incluirMoneda').addEventListener('change', (e) => {
@@ -243,10 +166,8 @@ resultado.addEventListener('click', () => {
         navigator.clipboard.writeText(text);
         resultado.classList.add('text-success');
         setTimeout(() => resultado.classList.remove('text-success'), 800);
-        showToast("Texto copiado");
     }
 });
-
 
 resultadosLista.addEventListener('click', (e) => {
     const cell = e.target.closest('td');
@@ -254,10 +175,8 @@ resultadosLista.addEventListener('click', (e) => {
         navigator.clipboard.writeText(cell.textContent);
         cell.classList.add('bg-success', 'text-white');
         setTimeout(() => cell.classList.remove('bg-success', 'text-white'), 800);
-        showToast("Celda copiada");
     }
 });
-
 
 // Copiar columna de texto (solo letras)
 document.getElementById('copiar-texto').addEventListener('click', () => {
@@ -268,8 +187,6 @@ document.getElementById('copiar-texto').addEventListener('click', () => {
     if (letras) {
         navigator.clipboard.writeText(letras);
         highlightHeader('copiar-texto');
-        showToast("Columna copiada");
-
     }
 });
 
@@ -292,8 +209,6 @@ document.getElementById('copiar-completo').addEventListener('click', () => {
     if (texto) {
         navigator.clipboard.writeText(texto);
         highlightHeader('copiar-completo');
-        showToast("Tabla copiada");
-
     }
 });
 
@@ -313,53 +228,6 @@ document.getElementById('version-selector').addEventListener('change', (e) => {
     } else {
         window.location.href = `/version/${selectedVersion}/`;
     }
-});
-
-
-const showToast = (message, isError = false) => {
-    const toastElement = document.getElementById('main-toast');
-    const toastBody = document.getElementById('toast-body');
-
-    toastBody.textContent = message;
-
-    toastElement.classList.remove('bg-success', 'bg-danger');
-    toastElement.classList.add(isError ? 'bg-danger' : 'bg-success');
-
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-};
-
-document.getElementById('exportar-csv').addEventListener('click', () => {
-    const filas = Array.from(resultadosLista.querySelectorAll('tr'));
-
-    if (filas.length === 0) {
-        showToast("No hay datos para exportar", true);
-        return;
-    }
-
-    let contenido = "Número,Texto\n";
-
-    filas.forEach(row => {
-        const celdas = row.querySelectorAll('td');
-        if (celdas.length === 2) {
-            const numero = celdas[0].textContent.trim().replace(/,/g, ''); // evitar comas
-            const texto = celdas[1].textContent.trim().replace(/"/g, '""'); // escapa comillas dobles
-            contenido += `"${numero}","${texto}"\n`;
-        }
-    });
-
-    // Crear el archivo y forzar la descarga
-    const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'numeros_convertidos.csv';
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    showToast("Archivo CSV descargado");
 });
 
 

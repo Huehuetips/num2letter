@@ -224,3 +224,39 @@ const highlightHeader = (id) => {
     th.classList.add('bg-success', 'text-white');
     setTimeout(() => th.classList.remove('bg-success', 'text-white'), 800);
 };
+document.addEventListener('DOMContentLoaded', async () => {
+    const versionSelector = document.getElementById('version-selector');
+    const currentVersion = window.location.pathname.split('/').filter(Boolean).pop(); // e.g. 'v1.1.0'
+
+    try {
+        const response = await fetch('/versions.json');
+        const versiones = await response.json();
+
+        // Limpiar opciones anteriores
+        versionSelector.innerHTML = '';
+
+        versiones.forEach(ver => {
+            const opt = document.createElement('option');
+            opt.value = ver;
+            opt.textContent = ver.replace('v', '');
+            if (ver === currentVersion) opt.selected = true;
+            versionSelector.appendChild(opt);
+        });
+
+
+    } catch (err) {
+        console.error('Error cargando versiones:', err);
+        showToast("No se pudo cargar la lista de versiones", true);
+    }
+});
+
+document.getElementById('version-selector').addEventListener('change', (e) => {
+    const selectedVersion = e.target.value;
+
+    if (selectedVersion === 'actually') {
+        window.location.href = '/';
+    } else {
+        window.location.href = `/version/${selectedVersion}/`;
+    }
+});
+
