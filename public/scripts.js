@@ -205,6 +205,37 @@ const actualizarResultadosLista = () => {
             
         });
     });
+
+    // Mostrar resumen
+    const resumenDiv = document.getElementById('resumen-lista');
+    const spanCantidad = document.getElementById('resumen-cantidad');
+    const spanValidos = document.getElementById('resumen-validos');
+    const linkErrores = document.getElementById('resumen-errores');
+
+    const totalIngresados = lineas.length;
+    const totalValidos = nuevosNumeros.length;
+    const totalErrores = totalIngresados - totalValidos;
+
+    spanCantidad.textContent = `${totalIngresados} número${totalIngresados !== 1 ? 's' : ''}`;
+    spanValidos.textContent = totalValidos;
+    linkErrores.textContent = `${totalErrores} error${totalErrores !== 1 ? 'es' : ''}`;
+
+    // Mostrar u ocultar el resumen
+    resumenDiv.classList.toggle('d-none', totalIngresados === 0);
+
+    // Guardar referencia a la primera fila con error
+    const primerError = resultadosLista.querySelector('td.text-danger');
+
+    // Scroll al hacer clic
+    linkErrores.onclick = (e) => {
+        e.preventDefault();
+        if (primerError) {
+            primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            primerError.classList.add('bg-warning');
+            setTimeout(() => primerError.classList.remove('bg-warning'), 800);
+        }
+    };
+
 };
 
 

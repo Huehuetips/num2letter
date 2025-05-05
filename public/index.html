@@ -102,6 +102,14 @@
         <button id="exportar-csv" class="btn btn-outline-primary btn-sm mb-3">📁 Exportar CSV</button>
     
         <div class="table-responsive mt-3">
+          <div id="resumen-lista" class="alert alert-light border d-flex justify-content-between align-items-center p-2 small mb-2 d-none">
+            <span id="resumen-cantidad"></span>
+            <span>
+              ✅ <strong id="resumen-validos">0</strong>  
+              ❌ <a href="#" id="resumen-errores" class="text-danger text-decoration-none">0 errores</a>
+            </span>
+          </div>
+          
           <table class="table table-bordered">
             <thead>
               <tr>
@@ -131,7 +139,7 @@
 
   <!-- ⚙️ Footer -->
   <footer class="text-center mt-auto py-3 small text-muted border-top">
-    Proyecto por <strong>Adony Montejo 'emontejodev'</strong> · Versión 1.0.2<br>
+    Proyecto por <strong>Adony Montejo 'emontejodev'</strong> · Versión 1.0.3<br>
     Convertidor De número a texto<br>
     © 2025 - Todos los derechos reservados
   </footer>
