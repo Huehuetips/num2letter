@@ -13,7 +13,6 @@
   "dependencies": {
     "archiver": "^7.0.1",
     "body-parser": "^2.2.0",
-    "express": "^5.1.0",
-    "numero-a-letras": "^1.0.6"
+    "express": "^5.1.0"
   }
 }

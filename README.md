@@ -28,7 +28,7 @@ Esta API permite convertir números a su representación en letras, con soporte 
    npm start
    ```
 
-El servidor estará disponible en `http://localhost:3000`.
+El servidor estará disponible en `http://num2letter.emontejodev.com`.
 
 ## Endpoints
 
@@ -42,13 +42,13 @@ Convierte un número o una lista de números a su representación en letras.
 
 #### Parámetros del cuerpo (JSON)
 
-| Parámetro              | Tipo       | Descripción                                                                 |
-|------------------------|------------|-----------------------------------------------------------------------------|
-| `numero`               | `number` o `array` | Número o lista de números a convertir.                                      |
-| `incluirMoneda`        | `string`   | `"true"` para incluir la moneda, `"false"` para omitirla.                   |
-| `nombreMoneda`         | `string`   | Nombre de la moneda (por defecto: `"Quetzales"`).                           |
-| `mostrarCentavos`      | `string`   | `"true"` para mostrar los decimales, `"false"` para omitirlos.              |
-| `mostrarCentavosEnNumeros` | `string` | `"true"` para mostrar los decimales en números, `"false"` para mostrarlos en letras. |
+| Parámetro                 | Tipo       | Descripción                                                                        |
+|---------------------------|------------|------------------------------------------------------------------------------------|
+| `numero`                  | `number`/`array` | Número o lista de números a convertir.                                     |
+| `incluirMoneda`           | `bool`     | `"true"` para incluir la moneda, `"false"` para omitirla.                          |
+| `nombreMoneda`            | `string`   | Nombre de la moneda (por defecto: `"Quetzales"`).                                  |
+| `mostrarCentavos`         | `bool`     | `"true"` para mostrar los decimales, `"false"` para omitirlos.                     |
+| `mostrarCentavosEnNumeros`| `string`   | `"true"` para mostrar los decimales en números, `"false"` para mostrarlos en letras. |
 
 #### Ejemplo de solicitud
 
@@ -59,7 +59,7 @@ Content-Type: application/json
 {
   "numero": 1234.56,
   "incluirMoneda": "true",
-  "nombreMoneda": "Quetzales",
+  "nombreMoneda": "Dolares",
   "mostrarCentavos": "true",
   "mostrarCentavosEnNumeros": "false"
 }
