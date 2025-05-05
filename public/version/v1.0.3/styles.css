@@ -1,0 +1,81 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* ANIMACIÓN PARA CELDAS QUE CAMBIAN */
+.celda-actualizada {
+    animation: resaltarCelda 0.6s ease-in-out;
+    background-color: #d1e7dd !important;
+    transition: background-color 0.3s ease;
+}
+
+@keyframes resaltarCelda {
+    0% {
+        background-color: #a5d6c4;
+        transform: scale(1.02);
+        opacity: 0.6;
+    }
+    60% {
+        background-color: #d1e7dd;
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        background-color: transparent;
+        opacity: 1;
+    }
+}
+
+/* Puedes conservar esto si también lo usás para la fila completa en otro contexto */
+.fila-actualizada {
+    animation: fadeIn 0.4s ease-in-out;
+    background-color: #e6f4ea !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+#toggle-api {
+    font-size: 0.875rem;
+    transition: color 0.2s ease;
+}
+
+#toggle-api:hover {
+    color: #555;
+    text-decoration: underline;
+}
+
+#copiar-api {
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #666;
+}
+
+#copiar-api:hover {
+    color: #000;
+    transform: scale(1.1);
+}
+
+#toggle-api{
+    color: grey;
+    text-decoration: none;
+}

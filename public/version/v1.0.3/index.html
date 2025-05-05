@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Convertir Números a Letras</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="container py-5">
+
+  <h1 class="text-center mb-4">Convertir Números a Letras</h1>
+
+  <!-- 🔧 Configuración Global -->
+  <div id="config-panel" class="bg-light border rounded p-2 mb-4 small d-flex flex-wrap align-items-center gap-3">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="incluirMoneda" name="incluirMoneda">
+      <label class="form-check-label" for="incluirMoneda">Contable</label>
+    </div>
+  
+    <div id="nombreMoneda-container" class="d-none">
+      <input type="text" id="nombreMoneda" name="nombreMoneda" class="form-control form-control-sm" placeholder="Moneda">
+    </div>
+  
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="mostrarCentavos" name="mostrarCentavos" checked>
+      <label class="form-check-label" for="mostrarCentavos">Decimales</label>
+    </div>
+  
+    <div class="form-check form-switch d-none">
+      <input class="form-check-input" type="checkbox" id="mostrarCentavosEnNumeros" name="mostrarCentavosEnNumeros">
+      <label class="form-check-label" for="mostrarCentavosEnNumeros">Decimales num.</label>
+    </div>
+  </div>
+  
+  <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <!-- Panel API con ancho expandido -->
+    <div class="flex-grow-1">
+      <button id="toggle-api" class="btn btn-link p-0 text-decoration-none small" type="button">
+        ▸ Ver consulta API
+      </button>
+      
+  
+      <div id="api-panel" class="mt-2 d-none border rounded bg-light p-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h6 class="fw-bold mb-0">Consulta a la API</h6>
+          <button id="copiar-api" class="btn btn-sm p-0 border-0 bg-transparent text-muted" title="Copiar JSON" aria-label="Copiar JSON">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+              <path d="M10 1.5v1h2a.5.5 0 0 1 .5.5v10.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h2v-1a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5zM9 2v-1H7v1h2z"/>
+            </svg>
+          </button>                  
+        </div>
+        <pre class="small mb-0"><code id="api-content">Esperando datos...</code></pre>
+      </div>
+    </div>
+  
+    <!-- Selector de versión fijo al borde derecho -->
+     
+    <label for="version-selector" class="form-label">Version:</label>
+    <select id="version-selector" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+      <option disabled selected hidden>Cargando...</option>
+    </select>
+    
+  </div>
+  
+  
+  
+
+  <!-- 🔁 Tabs -->
+  <ul class="nav nav-tabs mb-4" id="tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="tab-individual-tab" data-bs-toggle="tab" data-bs-target="#tab-individual" type="button" role="tab">Número individual</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tab-lista-tab" data-bs-toggle="tab" data-bs-target="#tab-lista" type="button" role="tab">Lista</button>
+    </li>
+  </ul>
+
+  <!-- 📦 Contenido de Tabs -->
+  <div class="tab-content" id="tabContent">
+    
+    <!-- Tab: Número individual -->
+    <div class="tab-pane fade show active" id="tab-individual" role="tabpanel">
+      <form id="convertir-form" class="card p-4 shadow mb-4">
+        <div class="mb-3">
+          <label for="numero" class="form-label">Número:</label>
+          <input type="number" id="numero" name="numero" class="form-control" step="any" required>
+        </div>
+        <p id="resultado" class="text-center">
+          <span id="loading-individual" class="spinner-border spinner-border-sm text-primary d-none" role="status"></span>
+        </p>
+      </form>
+    </div>
+
+    <!-- Tab: Lista -->
+    <div class="tab-pane fade" id="tab-lista" role="tabpanel">
+      <div class="card p-4 shadow mb-4">
+        <h2 class="text-center mb-3">Convertir lista de números</h2>
+        <textarea id="listaNumeros" class="form-control mb-3" rows="5" placeholder="Un número por línea"></textarea>
+    
+        <!-- 📁 Botón de exportar CSV -->
+        <button id="exportar-csv" class="btn btn-outline-primary btn-sm mb-3">📁 Exportar CSV</button>
+    
+        <div class="table-responsive mt-3">
+          <div id="resumen-lista" class="alert alert-light border d-flex justify-content-between align-items-center p-2 small mb-2 d-none">
+            <span id="resumen-cantidad"></span>
+            <span>
+              ✅ <strong id="resumen-validos">0</strong>  
+              ❌ <a href="#" id="resumen-errores" class="text-danger text-decoration-none">0 errores</a>
+            </span>
+          </div>
+          
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th id="copiar-completo" style="cursor: pointer;">Número</th>
+                <th id="copiar-texto" style="cursor: pointer;">Texto</th>
+              </tr>
+            </thead>
+            <tbody id="resultadosLista"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+
+  </div>
+
+    <!-- Toasts -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055">
+    <div id="main-toast" class="toast fade align-items-center text-white bg-success border-0" role="alert">
+      <div class="d-flex">
+        <div class="toast-body" id="toast-body">Listo</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ⚙️ Footer -->
+  <footer class="text-center mt-auto py-3 small text-muted border-top">
+    Proyecto por <strong>Adony Montejo 'emontejodev'</strong> · Versión 1.0.3<br>
+    Convertidor De número a texto<br>
+    © 2025 - Todos los derechos reservados
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="scripts.js"></script>
+</body>
+</html>
