@@ -1,66 +1,101 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Convertir Números a Letras</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>Convertir Números a Letras</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body class="container py-5">
-    <h1 class="text-center mb-4">Convertir Números a Letras</h1>
-    <div class="row">
-        <div class="col-md-6">
-            <form id="convertir-form" class="card p-4 shadow">
-                <div class="mb-3">
-                    <label for="numero">Ingresa un número:</label>
-                    <input type="number" id="numero" name="numero" class="form-control" step="any" required>
-                </div>
-                <p id="resultado" class="text-center">
-                    <span id="loading-individual" class="spinner-border spinner-border-sm text-primary d-none" role="status"></span>
-                </p>
 
-                <div class="d-flex align-items-center mb-3">
-                    <div class="form-check form-switch me-3">
-                        <input class="form-check-input" type="checkbox" id="incluirMoneda" name="incluirMoneda">
-                        <label class="form-check-label" for="incluirMoneda">Contable</label>
-                    </div>
-                    <div id="nombreMoneda-container" class="d-none flex-grow-1">
-                        <input type="text" id="nombreMoneda" name="nombreMoneda" class="form-control" placeholder="Quetzales">
-                    </div>
-                </div>
-                
-                <div class="form-check form-switch mb-3">
-                    <input class="form-check-input" type="checkbox" id="mostrarCentavos" name="mostrarCentavos" checked>
-                    <label class="form-check-label" for="mostrarCentavos">Mostrar decimales</label>
-                    
-                    <div class="form-check form-switch mt-3 d-none">
-                        <input class="form-check-input" type="checkbox" id="mostrarCentavosEnNumeros" name="mostrarCentavosEnNumeros">
-                        <label class="form-check-label" for="mostrarCentavosEnNumeros">decimales en números</label>
-                    </div>
-                </div>
-            </form>
+  <h1 class="text-center mb-4">Convertir Números a Letras</h1>
+
+  <!-- 🔧 Configuración Global -->
+  <div id="config-panel" class="bg-light border rounded p-2 mb-4 small d-flex flex-wrap align-items-center gap-3">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="incluirMoneda" name="incluirMoneda">
+      <label class="form-check-label" for="incluirMoneda">Contable</label>
+    </div>
+  
+    <div id="nombreMoneda-container" class="d-none">
+      <input type="text" id="nombreMoneda" name="nombreMoneda" class="form-control form-control-sm" placeholder="Moneda">
+    </div>
+  
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="mostrarCentavos" name="mostrarCentavos" checked>
+      <label class="form-check-label" for="mostrarCentavos">Decimales</label>
+    </div>
+  
+    <div class="form-check form-switch d-none">
+      <input class="form-check-input" type="checkbox" id="mostrarCentavosEnNumeros" name="mostrarCentavosEnNumeros">
+      <label class="form-check-label" for="mostrarCentavosEnNumeros">Decimales num.</label>
+    </div>
+  </div>
+  
+  <div class="text-end mb-3">
+    <label for="version-selector" class="form-label">Seleccionar versión:</label>
+    <select id="version-selector" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+      <option value="v1.1.0" selected>1.1.0</option>
+      <option value="v1.0.0">1.0.0</option>
+    </select>
+  </div>
+
+  <!-- 🔁 Tabs -->
+  <ul class="nav nav-tabs mb-4" id="tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="tab-individual-tab" data-bs-toggle="tab" data-bs-target="#tab-individual" type="button" role="tab">Número individual</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tab-lista-tab" data-bs-toggle="tab" data-bs-target="#tab-lista" type="button" role="tab">Lista</button>
+    </li>
+  </ul>
+
+  <!-- 📦 Contenido de Tabs -->
+  <div class="tab-content" id="tabContent">
+    
+    <!-- Tab: Número individual -->
+    <div class="tab-pane fade show active" id="tab-individual" role="tabpanel">
+      <form id="convertir-form" class="card p-4 shadow mb-4">
+        <div class="mb-3">
+          <label for="numero" class="form-label">Número:</label>
+          <input type="number" id="numero" name="numero" class="form-control" step="any" required>
         </div>
-        <div class="col-md-6">
-            <div class="card p-4 shadow">
-                <h2 class="text-center mb-3">Convertir Lista de Números</h2>
-                <textarea id="listaNumeros" class="form-control mb-3" rows="5" placeholder="Pega aquí tu lista de números, uno por línea"></textarea>
-                <div class="table-responsive mt-3">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th id="copiar-completo" style="cursor: pointer;">Número</th>
-                                <th id="copiar-texto" style="cursor: pointer;">Texto</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultadosLista"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <p id="resultado" class="text-center">
+          <span id="loading-individual" class="spinner-border spinner-border-sm text-primary d-none" role="status"></span>
+        </p>
+      </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="scripts.js"></script>
+    <!-- Tab: Lista -->
+    <div class="tab-pane fade" id="tab-lista" role="tabpanel">
+      <div class="card p-4 shadow mb-4">
+        <h2 class="text-center mb-3">Convertir lista de números</h2>
+        <textarea id="listaNumeros" class="form-control mb-3" rows="5" placeholder="Un número por línea"></textarea>
+        <div class="table-responsive mt-3">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th id="copiar-completo" style="cursor: pointer;">Número</th>
+                <th id="copiar-texto" style="cursor: pointer;">Texto</th>
+              </tr>
+            </thead>
+            <tbody id="resultadosLista"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ⚙️ Footer -->
+  <footer class="text-center mt-auto py-3 small text-muted border-top">
+    Proyecto por <strong>Adony Montejo 'emontejodev'</strong> · Versión 1.0.1<br>
+    Convertidor numérico con opciones contables<br>
+    © 2025 - Todos los derechos reservados
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="scripts.js"></script>
 </body>
 </html>

@@ -7,12 +7,8 @@ const loadingIndividual = document.getElementById('loading-individual');
 
 // Inputs de configuración (todos los que no sean el número ni la lista)
 const configInputs = [
-    ...Array.from(form.querySelectorAll('input')).filter(input =>
-        input.id !== 'numero' && input.id !== 'listaNumeros'
-    ),
-    document.getElementById('nombreMoneda') // incluir campo de texto de la moneda
+    ...Array.from(document.querySelectorAll('#incluirMoneda, #mostrarCentavos, #mostrarCentavosEnNumeros, #nombreMoneda'))
 ];
-
 
 // Estado para evitar llamadas repetidas
 let ultimoNumeroConvertido = null;
@@ -216,11 +212,15 @@ document.getElementById('copiar-completo').addEventListener('click', () => {
     }
 });
 
-
-
 // Estilo temporal al header
 const highlightHeader = (id) => {
     const th = document.getElementById(id);
     th.classList.add('bg-success', 'text-white');
     setTimeout(() => th.classList.remove('bg-success', 'text-white'), 800);
 };
+
+// Cambiar de versión al seleccionar una opción
+document.getElementById('version-selector').addEventListener('change', (e) => {
+    const selectedVersion = e.target.value;
+    window.location.href = `/version/${selectedVersion}/`;
+});
