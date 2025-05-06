@@ -124,7 +124,7 @@ footer {
 }
 
 .config-panel {
-    position: absolute; /* Cambiar a absolute para permitir movimiento */
+    position: fixed; /* Cambiar a absolute para permitir movimiento */
     cursor: grab; /* Indicar que el panel es movible */
     top: 20%;
     left: 10px;
