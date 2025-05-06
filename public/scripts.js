@@ -18,7 +18,7 @@ toggleApiBtn.addEventListener('click', () => {
 
 const mostrarConsultaApi = (params) => {
     const payload = JSON.stringify(params, null, 2);
-    apiContent.textContent = `POST /convertir\n\n${payload}`;
+    apiContent.textContent = `\n${payload}`;
 };
 
 copiarApiBtn.addEventListener('click', () => {
@@ -419,3 +419,61 @@ document.addEventListener('DOMContentLoaded', async () => {
         showToast("No se pudo cargar la lista de versiones", true);
     }
 });
+
+const configPanel = document.getElementById('config-panel');
+
+const updateConfigPanelClasses = () => {
+    const isFloating = document.getElementById('panelFlotante').checked;
+    if (!isFloating) {
+        configPanel.classList.remove('config-panel');
+        configPanel.classList.add('bg-light', 'border', 'rounded', 'p-2', 'mb-4', 'small', 'd-flex', 'flex-wrap', 'align-items-center', 'gap-3');
+    } else {
+        configPanel.classList.add('config-panel');
+        configPanel.classList.remove('bg-light', 'border', 'rounded', 'p-2', 'mb-4', 'small', 'd-flex', 'flex-wrap', 'align-items-center', 'gap-3');
+    }
+};
+
+document.getElementById('panelFlotante').addEventListener('change', updateConfigPanelClasses);
+
+document.addEventListener('DOMContentLoaded', updateConfigPanelClasses);
+
+const makePanelDraggable = (panel) => {
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    const startDrag = (e) => {
+        isDragging = true;
+        const event = e.touches ? e.touches[0] : e;
+        offsetX = event.clientX - panel.getBoundingClientRect().left;
+        offsetY = event.clientY - panel.getBoundingClientRect().top;
+        panel.style.cursor = 'grabbing';
+    };
+
+    const drag = (e) => {
+        if (!isDragging) return;
+        const event = e.touches ? e.touches[0] : e;
+        panel.style.left = `${event.clientX - offsetX}px`;
+        panel.style.top = `${event.clientY - offsetY}px`;
+    };
+
+    const endDrag = () => {
+        isDragging = false;
+        panel.style.cursor = 'grab';
+    };
+
+    panel.addEventListener('mousedown', startDrag);
+    panel.addEventListener('touchstart', startDrag);
+
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('touchmove', drag);
+
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchend', endDrag);
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const configPanel = document.getElementById('config-panel');
+    makePanelDraggable(configPanel);
+});
+

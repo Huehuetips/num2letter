@@ -12,7 +12,12 @@
   <h1 class="text-center mb-4">Convertir Números a Letras</h1>
 
   <!-- 🔧 Configuración Global -->
-  <div id="config-panel" class="bg-light border rounded p-2 mb-4 small d-flex flex-wrap align-items-center gap-3">
+  <div id="config-panel" class="config-panel bg-light border rounded p-2 mb-4 small d-flex flex-wrap align-items-center gap-3">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="panelFlotante" name="panelFlotante" checked>
+      <label class="form-check-label" for="panelFlotante">Panel flotante</label>
+    </div>
+
     <div class="form-check form-switch">
       <input class="form-check-input" type="checkbox" id="incluirMoneda" name="incluirMoneda">
       <label class="form-check-label" for="incluirMoneda">Contable</label>
@@ -31,6 +36,7 @@
       <input class="form-check-input" type="checkbox" id="mostrarCentavosEnNumeros" name="mostrarCentavosEnNumeros">
       <label class="form-check-label" for="mostrarCentavosEnNumeros">Decimales num.</label>
     </div>
+
   </div>
   
   <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
@@ -43,7 +49,7 @@
   
       <div id="api-panel" class="mt-2 d-none border rounded bg-light p-3">
         <div class="d-flex justify-content-between align-items-start mb-2">
-          <h6 class="fw-bold mb-0">Consulta a la API</h6>
+          <h6 class="fw-bold mb-0">POST /convertir</h6>
           <button id="copiar-api" class="btn btn-sm p-0 border-0 bg-transparent text-muted" title="Copiar JSON" aria-label="Copiar JSON">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
               <path d="M10 1.5v1h2a.5.5 0 0 1 .5.5v10.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h2v-1a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5zM9 2v-1H7v1h2z"/>
@@ -139,7 +145,7 @@
 
   <!-- ⚙️ Footer -->
   <footer class="text-center mt-auto py-3 small text-muted border-top">
-    Proyecto por <strong>Adony Montejo 'emontejodev'</strong> · Versión 1.0.3<br>
+    Proyecto por <strong>Adony Montejo 'emontejodev'</strong> · Versión 1.0.4<br>
     Convertidor De número a texto<br>
     © 2025 - Todos los derechos reservados
   </footer>
